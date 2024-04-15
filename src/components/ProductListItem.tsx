@@ -1,5 +1,12 @@
 import Colors from "@/src/constants/Colors";
-import { View, StyleSheet, Text, Image, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  Pressable,
+  useColorScheme,
+} from "react-native";
 import { Product } from "../types";
 import { Link } from "expo-router";
 
@@ -11,6 +18,7 @@ type ProductListItemProps = {
 };
 
 const ProductListItem = ({ product }: ProductListItemProps) => {
+  const colorscheme = useColorScheme();
   return (
     <Link href={`/menu/${product.id}`} asChild>
       <Pressable style={styles.container}>
