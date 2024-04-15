@@ -8,7 +8,7 @@ import {
   useColorScheme,
 } from "react-native";
 import { Product } from "../types";
-import { Link } from "expo-router";
+import { Href, HrefObject, Link, LinkProps, useSegments } from "expo-router";
 
 export const defaultPizzaImage =
   "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png";
@@ -17,10 +17,20 @@ type ProductListItemProps = {
   product: Product;
 };
 
+type Segment<T> = T extends
+  | Href<T | string>
+  | HrefObject<Record<string, string>>
+  ? T
+  : never;
+
 const ProductListItem = ({ product }: ProductListItemProps) => {
-  const colorscheme = useColorScheme();
+  const segments = useSegments();
+  const path: Segment<Href<string>> = `/${segments[0] || ""}/menu/${
+    product.id
+  }` as `${string}:${string}`;
+
   return (
-    <Link href={`/menu/${product.id}`} asChild>
+    <Link href={path as `${string}:${string}`} asChild>
       <Pressable style={styles.container}>
         <Image
           source={{ uri: product.image || defaultPizzaImage }}
