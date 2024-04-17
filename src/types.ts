@@ -1,9 +1,12 @@
-export type Product = {
-  id: number;
-  image: string | null;
-  name: string;
-  price: number;
-};
+import { Database } from "./database.types";
+
+type Tables<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"];
+
+type Enums<T extends keyof Database["public"]["Enums"]> =
+  Database["public"]["Enums"][T];
+
+export type Product = Tables<"products">;
 
 export type PizzaSize = "S" | "M" | "L" | "XL";
 
@@ -43,9 +46,8 @@ export type OrderItem = {
   quantity: number;
 };
 
-export type Profile = {
-  id: string;
-  group: string;
-};
+export type Group = "ADMIN" | "USER";
+
+export type Profile = Tables<"profiles">;
 
 // OIVAin0YHBueP*Ne

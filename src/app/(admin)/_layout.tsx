@@ -21,7 +21,7 @@ export default function TabLayout() {
   const { isAdmin } = useAuth();
 
   if (!isAdmin) {
-    return <Redirect href="/(user)" />;
+    return <Redirect href="/" />;
   }
 
   return (

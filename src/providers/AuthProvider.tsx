@@ -7,10 +7,11 @@ import {
 } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { Session } from "@supabase/supabase-js";
+import { Profile } from "../types";
 
 type AuthData = {
   session: Session | null;
-  profile: any;
+  profile: Profile | null;
   isAdmin: boolean;
   loading: boolean;
 };
@@ -24,34 +25,43 @@ const AuthContext = createContext<AuthData>({
 
 export default function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const fetchProfile = async (session: Session | null) => {
+      try {
+        if (session) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+
+          setProfile(data || null);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const fetchSession = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       setSession(session);
 
-      if (session) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-
-        setProfile(data || null);
-      }
-
-      setLoading(false);
+      await fetchProfile(session);
     };
 
     fetchSession();
+    supabase.auth.onAuthStateChange(async (_event, sesh) => {
+      setLoading(true);
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setLoading(false);
+      setSession(sesh);
+      await fetchProfile(sesh);
     });
   }, []);
 

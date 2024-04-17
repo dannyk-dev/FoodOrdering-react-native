@@ -7,7 +7,6 @@ import { Redirect } from "expo-router";
 
 export default function ProfileScreen() {
   const { session, profile, isAdmin } = useAuth();
-  console.log(isAdmin);
 
   const signOut = () => {
     if (session) {
