@@ -1,14 +1,37 @@
-import { View, Text, FlatList } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import React from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
-import orders from "@/assets/data/orders";
 import OrderListItem from "@/src/components/OrderListItem";
 import OrderItemListItem from "@/src/components/OrderItemListItem";
+import { useOrderDetails } from "@/src/api/products";
+import { useUpdateOrderSubscription } from "@/src/api/orders/subscriptions";
 
 export default function OrderDetailsScreen() {
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
+  const id = parseFloat(typeof idString === "string" ? idString : idString[0]);
 
-  const order = orders.find((order) => order.id === +id);
+  const { data: order, isLoading, error } = useOrderDetails(id);
+  useUpdateOrderSubscription(id);
+
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error || !order) {
+    return (
+      <View style={styles.container}>
+        <Text>{error?.message || "No orders found"}</Text>
+      </View>
+    );
+  }
+
+  // const order = orders.find((order) => order.id === +id);
 
   if (!order) {
     return <Text>Order not found!</Text>;
@@ -28,3 +51,11 @@ export default function OrderDetailsScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    flex: 1,
+    padding: 10,
+  },
+});

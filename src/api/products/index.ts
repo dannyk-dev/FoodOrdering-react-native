@@ -1,4 +1,6 @@
+import { Tables } from "@/src/database.types";
 import { supabase } from "@/src/lib/supabase";
+import { Order } from "@/src/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useProductList = () => {
@@ -88,6 +90,22 @@ export const useDeleteProduct = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useOrderDetails = (id: number) => {
+  return useQuery({
+    queryKey: ["orders", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*, order_items(*, products(*))")
+        .eq("id", id)
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
     },
   });
 };
