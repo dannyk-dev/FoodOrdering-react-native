@@ -1,9 +1,12 @@
 import Colors from "@/src/constants/Colors";
+import { useAuth } from "@/src/providers/AuthProvider";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
 import { Pressable } from "react-native";
 
 export default function MenuStack() {
+  const { isAdmin } = useAuth();
+
   return (
     <Stack
       screenOptions={{
@@ -21,6 +24,21 @@ export default function MenuStack() {
             </Pressable>
           </Link>
         ),
+        headerLeft: () =>
+          isAdmin && (
+            <Link href="/" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="home"
+                    size={25}
+                    color={Colors.light.text}
+                    style={{ marginHorizontal: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
       }}
     >
       <Stack.Screen name="index" options={{ title: "Menu" }} />
